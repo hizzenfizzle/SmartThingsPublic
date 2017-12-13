@@ -25,9 +25,14 @@ definition(
 
 
 preferences {
-	section("Title") {
-		// TODO: put inputs here
+	section("What to Turn On") {
+		paragraph: "Choose what to turn on" 
+        input "switches", "capability.switch", required:true, title:"Switches?", multiple: true
 	}
+    section("How long"){
+    	paragraph: "How long should the item(s) remain on?"
+        input "minutes", "number", required: true, title: "Minutes?"
+    }
 }
 
 def installed() {
@@ -44,7 +49,24 @@ def updated() {
 }
 
 def initialize() {
-	// TODO: subscribe to attributes, devices, locations, etc.
+	subscribe(app, appTouchHandler)
 }
 
-// TODO: implement event handlers
+def appTouchHandler(evt) {
+    log.debug "app event ${evt.name}:${evt.value} received"
+    
+    def runSeconds = minutes * 60
+    runIn(runSeconds, switchHandler)
+    log.debug "runIn called for $runSeconds seconds"
+    switches.each {
+    	it.on()
+    }
+    log.debug "$switches switches turned on"
+}
+
+def switchHandler(){
+	log.debug "handler called to turn off switches"
+	switches.each {
+    	it.off()
+    }
+}
