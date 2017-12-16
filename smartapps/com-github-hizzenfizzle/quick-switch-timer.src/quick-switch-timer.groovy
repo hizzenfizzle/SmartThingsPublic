@@ -55,18 +55,29 @@ def initialize() {
 def appTouchHandler(evt) {
     log.debug "app event ${evt.name}:${evt.value} received"
     
-    def runSeconds = minutes * 60
-    runIn(runSeconds, switchHandler)
-    log.debug "runIn called for $runSeconds seconds"
-    switches.each {
-    	it.on()
-    }
-    log.debug "$switches switches turned on"
+    switchesOn()
+    turnOffLater()
 }
 
-def switchHandler(){
+def switchesOn(){
+	log.debug "handler called to turn switches on"
+	switches.each{
+    	it.on()
+        log.debug "ON command sent to [$it]"
+    }
+}
+
+def switchesOff(){
 	log.debug "handler called to turn off switches"
 	switches.each {
     	it.off()
+        log.debug "OFF command sent to [$it]"
     }
+}
+
+    
+def turnOffLater(){
+	def runSeconds = minutes * 60
+    runIn(runSeconds, switchesOff)
+    log.debug "runIn called for $runSeconds seconds"
 }
